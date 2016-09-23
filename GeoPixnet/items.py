@@ -7,10 +7,6 @@
 
 from scrapy import Field,Item
 
-class LocationItem(Item):
-    lat = Field()
-    lng = Field()
-    addr = Field()
 
 class GeopixnetItem(Item):
     # define the fields for your item here like:
@@ -18,6 +14,8 @@ class GeopixnetItem(Item):
     url = Field()
     title = Field()
     desc = Field()
-    location = LocationItem()
+    images = Field()
+    address = Field()
+    location = Field()
 
 

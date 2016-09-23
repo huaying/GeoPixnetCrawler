@@ -1,0 +1,6 @@
+
+logs
+*log
+GeoPixnet/data
+GeoPixnet/crawls
+*__pycache__*

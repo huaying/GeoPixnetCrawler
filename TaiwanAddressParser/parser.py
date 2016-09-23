@@ -1,6 +1,9 @@
 # -- coding: UTF-8 --
 import json, collections, re, os
 import urllib.request
+#import sys
+#sys.path.append('../')
+import GoogleApiKey.key
 
 class TaiwanAddrParser:
 
@@ -82,18 +85,29 @@ class TaiwanAddrParser:
                     addrs.append(addrdata)
         return addrs
 
-    def validateAddr(self,addr):
+    def validateAddr(self,addr, retry = 0):
         """
         check this given address on google api to see if it's valid
         """
-        googleapi = "http://maps.googleapis.com/maps/api/geocode/json?address="
+        if retry > 20: return None
+
+        #api_key = "AIzaSyAAdHJCqwnkCfeU92LerKfPTCNkN0QtxVY"
+        api_key = GoogleApiKey.key.getKey()
+        googleapi = "https://maps.googleapis.com/maps/api/geocode/json?key="+api_key+"&address="
+        #print(googleapi)
         geocode = urllib.request.urlopen(googleapi+urllib.parse.quote(addr))
         res = json.loads(geocode.read().decode('utf-8'))
 
         if res and res["results"]:
             rlt = res["results"][0]
-            if rlt["geometry"]["location_type"] != "APPROXIMATE" and "Taiwan" in rlt["formatted_address"]:
+            if rlt["geometry"]["location_type"] == "ROOFTOP" and "Taiwan" in rlt["formatted_address"]:
                 return (rlt["geometry"]["location"]["lat"],rlt["geometry"]["location"]["lng"])
+        
+        if res and not res["results"] and res["status"] == "OVER_QUERY_LIMIT":
+            api_key = GoogleApiKey.key.nextKey()
+            res = self.validateAddr(addr, retry = retry+1)        
+            if res: return res
+
         return None
 
 
